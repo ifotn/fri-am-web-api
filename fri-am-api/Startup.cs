@@ -15,6 +15,11 @@ using Microsoft.Extensions.Options;
 using fri_am_api.Models;
 using Microsoft.EntityFrameworkCore;
 
+// swagger references for documentation
+using NSwag.AspNetCore;
+using NJsonSchema;
+using System.Reflection;
+
 namespace fri_am_api
 {
     public class Startup
@@ -34,6 +39,17 @@ namespace fri_am_api
             // db connection
             string db = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<MusicStoreModel>(options => options.UseSqlServer(db));
+
+            // create Swagger document
+            services.AddSwaggerDocument(configure =>
+            {
+                configure.PostProcess = document =>
+                {
+                    document.Info.Version = "v1";
+                    document.Info.Title = "MVC Music Store API";
+                    document.Info.Description = "ASP.NET Core Web API";
+                };
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,6 +66,10 @@ namespace fri_am_api
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            // swagger
+            app.UseSwagger();
+            app.UseSwaggerUi3();
         }
     }
 }
